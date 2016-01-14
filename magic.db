@@ -1,0 +1,7 @@
+# Cronos databases
+0	string CroFile\0	Cronos Database File
+
+# Scripts
+0	string #!		
+>2	string /usr/bin/python  Python Script
+>2	string /bin/bash	Bash Script
