@@ -1,3 +1,8 @@
+#
+# This is a magic(5) data file for OCCRP's DataSurvey.
+#
+#
+
 # Cronos databases
 0	string CroFile\0				Cronos Database File
 !:mime	database/cronos
