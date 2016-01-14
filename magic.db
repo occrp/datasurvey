@@ -3,16 +3,16 @@
 !:mime	database/cronos
 
 # CSV, TSV
-0	regex	((["']{0,1})(.*)["']{0,1}[,])+	 	CSV File, Comma Separated
+0	regex	((["']{0,1})(.*)["']{0,1}[,])+/l2 	CSV File, Comma Separated
 !:mime  text/csv
 
-0	regex	((["']{0,1})(.*)["']{0,1}[;])+	 	CSV File, Semicolon Separated
+0	regex	((["']{0,1})(.*)["']{0,1}[;])+/l2 	CSV File, Semicolon Separated
 !:mime	text/csv
 
-0	regex	((["']{0,1})(.*)\2[\|])+ 		CSV File, Pipe Separated
+0	regex	((["']{0,1})(.*)["']{0,1}[\|])+ 	CSV File, Pipe Separated
 !:mime	text/csv
 
-0	regex	((["']{0,1})(.*)\2[\t])+ 		TSV File
+0	regex	((["']{0,1})(.*)["']{0,1}[\t])+ 	TSV File
 !:mime	text/tsv
 
 # Scripts
