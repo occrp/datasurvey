@@ -3,9 +3,17 @@ import os
 import click
 from magic import Magic
 
+class Recognizer:
+    def recognize(self, file):
+        raise NotImplemented()
+
+class RecognizeCSV:
+    pass
+
+
 class Scanner:
-    def __init__(self):
-        self.magic = Magic(magic_file='magic.db', uncompress=True)
+    def __init__(self, mime=False):
+        self.magic = Magic(magic_file='magic.db', mime=mime, uncompress=True)
         self._reset()
 
     def _reset(self):
@@ -30,8 +38,9 @@ class Scanner:
 
 @click.command()
 @click.argument('path', type=click.Path(exists=True))
-def main(path):
-    s = Scanner()
+@click.option('--mime', is_flag=True)
+def main(path, mime):
+    s = Scanner(mime)
     s.scan(path)
     s.report()
 
