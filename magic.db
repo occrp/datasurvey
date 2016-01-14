@@ -1,7 +1,24 @@
 # Cronos databases
-0	string CroFile\0	Cronos Database File
+0	string CroFile\0				Cronos Database File
+!:mime	database/cronos
+
+# CSV, TSV
+0	regex	((["']{0,1})(.*)["']{0,1}[,])+	 	CSV File, Comma Separated
+!:mime  text/csv
+
+0	regex	((["']{0,1})(.*)["']{0,1}[;])+	 	CSV File, Semicolon Separated
+!:mime	text/csv
+
+0	regex	((["']{0,1})(.*)\2[\|])+ 		CSV File, Pipe Separated
+!:mime	text/csv
+
+0	regex	((["']{0,1})(.*)\2[\t])+ 		TSV File
+!:mime	text/tsv
 
 # Scripts
 0	string #!		
->2	string /usr/bin/python  Python Script
->2	string /bin/bash	Bash Script
+>2	string /usr/bin/python  			Python Script
+!:mime	application/x-python
+>2	string /bin/bash				Bash Script
+!:mime	application/x-bash
+
