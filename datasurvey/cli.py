@@ -29,7 +29,7 @@ class Scanner:
             buffer = open(path, 'rb')
             mime = self.magic.from_file(path)
 
-        if mime in package_handlers.keys() and options['packages']:
+        if mime in package_handlers.keys() and self.options['packages']:
             a = package_handlers[mime](buffer)
             self.scan_archive(a)
         else:
@@ -84,8 +84,6 @@ class ReportCSV(Reporter):
             if self.options['size']:
                 line.append(details['size'])
             writer.writerow(line)
-
-
 
 class ReportAggregate(Reporter):
     def report(self):
