@@ -15,13 +15,13 @@ class PackageHandler:
 class ZipHandler(PackageHandler):
     MIMETYPES = ["application/zip"]
     def __init__(self, buffer):
-        PackageHandler.__init__(self)
+        PackageHandler.__init__(self, buffer)
         self.archive = zipfile.ZipFile(buffer)
 
 class RarHandler(PackageHandler):
     MIMETYPES = ["application/x-rar-compressed"]
     def __init__(self, buffer):
-        PackageHandler.__init__(self)
+        PackageHandler.__init__(self, buffer)
         self.archive = zipfile.RarFile(buffer)
 
 
