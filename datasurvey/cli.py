@@ -8,6 +8,7 @@ class Scanner:
     def __init__(self, **options):
         self.options = options
         self.mime = options['mime']
+        self.progress = options['progress']
         self.magic = Magic(magic_file='magic.db', mime=self.mime, uncompress=True)
         self._reset()
 
@@ -23,6 +24,9 @@ class Scanner:
         for root, directory, files in os.walk(path):
             for file in files:
                 self.total += 1
+                if self.progress and self.total % 10 == 0:
+                    print "\rScanned %d files..." % self.total,
+                    sys.stdout.flush()
                 path = os.path.join(root, file)
                 mime = self.scan_file(path)
                 if not mime in self.types: self.types[mime] = []
@@ -80,6 +84,7 @@ outputmodes = {
     default="report", help="Choose output format")
 @click.option('--size', is_flag=True, help="Show file sizes")
 @click.option('--target', type=click.File('w'), default='-')
+@click.option('--progress', is_flag=True, help="Show scanning progress")
 def main(path, **options):
     scanner = Scanner(**options)
     scanner.scan(path)
