@@ -3,14 +3,6 @@ import os
 import click
 from magic import Magic
 
-class Recognizer:
-    def recognize(self, file):
-        raise NotImplemented()
-
-class RecognizeCSV:
-    pass
-
-
 class Scanner:
     def __init__(self, mime=False):
         self.magic = Magic(magic_file='magic.db', mime=mime, uncompress=True)
@@ -31,18 +23,41 @@ class Scanner:
                 if not mime in self.types: self.types[mime] = []
                 self.types[mime].append(file)
 
-    def report(self):
-        for t, fs in self.types.iteritems():
-            print "%-35s: %d (%d%%)" % (t, len(fs), len(fs)*100/self.total)
 
+
+class Reporter:
+    def __init__(self, scanner):
+        self.scanner = scanner
+
+    def report(self):
+        raise NotImplemented()
+
+class ReportCSV(Reporter):
+    def report(self):
+        for t, fs in self.scanner.types.iteritems():
+            for f in fs:
+                print "\"%s\",\"%s\"" % (f, t)
+
+class ReportAggregate(Reporter):
+    def report(self):
+        for t, fs in self.scanner.types.iteritems():
+            print "%-35s: %d (%d%%)" % (t, len(fs), len(fs)*100/self.scanner.total)
+
+
+outputmodes = {
+    "csv":      ReportCSV,
+    "report":   ReportAggregate,
+}
 
 @click.command()
 @click.argument('path', type=click.Path(exists=True))
 @click.option('--mime', is_flag=True)
-def main(path, mime):
+@click.option('--output', type=click.Choice(outputmodes.keys()), default="report")
+def main(path, mime, output):
     s = Scanner(mime)
     s.scan(path)
-    s.report()
+    reporter = outputmodes[output](s)
+    reporter.report()
 
 
 if __name__ == "__main__":
