@@ -11,7 +11,7 @@ class Scanner:
         self.options = options
         self.mime = options['mime']
         self.progress = options['progress']
-        self.magic = Magic(magic_file='magic.db', mime=self.mime, uncompress=True)
+        self.magic = Magic(magic_file='magic.db', mime=self.mime, uncompress=False)
         self._reset()
 
     def _reset(self):
