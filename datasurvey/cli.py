@@ -37,7 +37,8 @@ class Scanner:
                     stat = os.stat(path)
                     self.files[path]['size'] = stat.st_size
                 self.types[mime].append(path)
-
+        if self.progress:
+            print ""
 
 class Reporter:
     def __init__(self, options, scanner):
@@ -77,9 +78,10 @@ class ReportBadmatch(Reporter):
 
     def report(self):
         for t in self.badmatches:
+            self.outfile.write("\n# %s\n\n" % (t))
             for fs in self.scanner.types[t]:
-                self.outfile.write("%d (%d%%)\n" % (t, len(fs),
-                    len(fs)*100/self.scanner.total))
+                self.outfile.write(" * %s\n" % (fs))
+            self.outfile.write("\n")
 
 
 outputmodes = {
