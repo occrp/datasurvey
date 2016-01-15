@@ -4,6 +4,7 @@ import sys
 import click
 import csv
 from magic import Magic
+from packages import package_handlers
 
 class Scanner:
     def __init__(self, **options):
@@ -18,25 +19,44 @@ class Scanner:
         self.files = {}
         self.total = 0
 
-    def scan_file(self, file):
-        return self.magic.from_file(file)
+    def get_file_magic(self, path):
+        return self.magic.from_file(path)
 
-    def scan(self, path):
+    def scan_file(self, path, buffer=None):
+        if buffer:
+            mime = self.magic.from_buffer(buffer)
+        else:
+            buffer = open(path, 'rb')
+            mime = self.magic.from_file(path)
+
+        if mime in package_handlers.keys() and options['packages']:
+            a = package_handlers[mime](buffer)
+            self.scan_archive(a)
+        else:
+            if not mime in self.types: self.types[mime] = []
+            self.files[path] = {}
+            self.files[path]['mime'] = mime
+            if self.options['size']:
+                stat = os.stat(path)
+                self.files[path]['size'] = stat.st_size
+            self.types[mime].append(path)
+
+    def scan_archive(self, archive):
+        for (filename, fh) in archive:
+            path = os.path.join(archive, filename)
+            self.total += 1
+            self.scan_file(path, fh)
+
+    def scan_path(self, path):
         for root, directory, files in os.walk(path):
             for file in files:
                 self.total += 1
+                path = os.path.join(root, file)
+                self.scan_file(path)
                 if self.progress and self.total % 10 == 0:
                     print "\rScanned %d files..." % self.total,
                     sys.stdout.flush()
-                path = os.path.join(root, file)
-                mime = self.scan_file(path)
-                if not mime in self.types: self.types[mime] = []
-                self.files[path] = {}
-                self.files[path]['mime'] = mime
-                if self.options['size']:
-                    stat = os.stat(path)
-                    self.files[path]['size'] = stat.st_size
-                self.types[mime].append(path)
+
         if self.progress:
             print ""
 
@@ -98,9 +118,10 @@ outputmodes = {
 @click.option('--size', is_flag=True, help="Show file sizes")
 @click.option('--target', type=click.File('w'), default='-')
 @click.option('--progress', is_flag=True, help="Show scanning progress")
+@click.option('--packages/--no-packages', default=True, help="Descend into packages")
 def main(path, **options):
     scanner = Scanner(**options)
-    scanner.scan(path)
+    scanner.scan_path(path)
     reporter = outputmodes[options['format']](options, scanner)
     reporter.report()
 
