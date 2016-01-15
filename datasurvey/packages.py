@@ -10,7 +10,11 @@ class PackageHandler:
 
     def __iter__(self):
         for name in self.archive.namelist():
-            yield (name, self.archive.open(name))
+            with self.archive.open(name) as ar:
+                # TODO: Handle archives
+                outbuf = ar.read(1000)
+
+            yield (name, outbuf)
 
 class ZipHandler(PackageHandler):
     MIMETYPES = ["application/zip"]
