@@ -71,10 +71,20 @@ class ReportAggregate(Reporter):
             self.outfile.write("%-35s: %d (%d%%)\n" % (t, len(fs),
                 len(fs)*100/self.scanner.total))
 
+class ReportBadmatch(Reporter):
+    badmatches = ["text/plain", "application/octet-stream"]
+
+    def report(self):
+        for t in self.badmatches:
+            for fs in self.scanner.types[t]:
+                self.outfile.write("%d (%d%%)\n" % (t, len(fs),
+                    len(fs)*100/self.scanner.total))
+
 
 outputmodes = {
     "csv":      ReportCSV,
     "report":   ReportAggregate,
+    "badmatch": ReportBadmatch,
 }
 
 @click.command()
