@@ -28,6 +28,9 @@ class Scanner:
                 if not mime in self.types: self.types[mime] = []
                 self.files[path] = {}
                 self.files[path]['mime'] = mime
+                if self.options['size']:
+                    stat = os.stat(path)
+                    self.files[path]['size'] = stat.st_size
                 self.types[mime].append(path)
 
 
@@ -46,10 +49,14 @@ class ReportCSV(Reporter):
         writer = csv.writer(self.options['target'])
 
         headers = ["filename", ["type", "mimetype"][self.scanner.mime]]
+        if self.options['size']:
+            headers.append('size')
 
         writer.writerow(headers)
         for f, details in self.scanner.files.iteritems():
             line = [f, details['mime']]
+            if self.options['size']:
+                line.append(details['size'])
             writer.writerow(line)
 
 
@@ -71,6 +78,7 @@ outputmodes = {
 @click.option('--mime', is_flag=True, help="Show mime types")
 @click.option('--format', type=click.Choice(outputmodes.keys()),
     default="report", help="Choose output format")
+@click.option('--size', is_flag=True, help="Show file sizes")
 @click.option('--target', type=click.File('w'), default='-')
 def main(path, **options):
     scanner = Scanner(**options)
