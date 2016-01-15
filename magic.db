@@ -1,6 +1,7 @@
 #
 # This is a magic(5) data file for OCCRP's DataSurvey.
 #
+# Parts of this file extracted from 'file' database
 #
 
 # Cronos databases
@@ -26,4 +27,47 @@
 !:mime	application/x-python
 >2	string /bin/bash				Bash Script
 !:mime	application/x-bash
+
+# RAR (Roshal Archive) archive
+0	string		Rar!\x1a\7\0		RAR archive data
+!:mime	application/x-rar
+# file header
+>(0xc.l+9)	byte	0x74
+>>(0xc.l+7)	use	rar-file-header
+# subblock seems to share information with file header
+>(0xc.l+9)	byte	0x7a
+>>(0xc.l+7)	use	rar-file-header
+>9		byte	0x73
+>>7		use	rar-archive-header
+
+0	string		Rar!\x1a\7\1\0		RAR archive data, v5
+!:mime	application/x-rar
+
+# Very old RAR archive
+# http://jasonblanks.com/wp-includes/images/papers/KnowyourarchiveRAR.pdf
+0	string		RE\x7e\x5e  RAR archive data (<v1.5)
+!:mime	application/x-rar
+
+
+# PKZIP multi-volume archive
+0	string		PK\x07\x08PK\x03\x04	Zip multi-volume archive data, at least PKZIP v2.50 to extract
+!:mime	application/zip
+
+# Zip archives (Greg Roelofs, c/o zip-bugs@wkuvx1.wku.edu)
+0	string		PK\005\006	Zip archive data (empty)
+!:mime application/zip
+0	string		PK\003\004
+
+
+# Generic zip archives (Greg Roelofs, c/o zip-bugs@wkuvx1.wku.edu)
+#   Next line excludes specialized formats:
+>(26.s+30)	leshort	!0xcafe
+>>26    string          !\x8\0\0\0mimetype	Zip archive data
+!:mime	application/zip
+>>>4	byte		0x09		\b, at least v0.9 to extract
+>>>4	byte		0x0a		\b, at least v1.0 to extract
+>>>4	byte		0x0b		\b, at least v1.1 to extract
+>>>4	byte		0x14		\b, at least v2.0 to extract
+>>>4	byte		0x2d		\b, at least v4.5 to extract
+>>>0x161	string		WINZIP		\b, WinZIP self-extracting
 
