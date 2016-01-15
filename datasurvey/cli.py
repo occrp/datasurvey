@@ -6,6 +6,7 @@ from magic import Magic
 class Scanner:
     def __init__(self, mime=False):
         self.magic = Magic(magic_file='magic.db', mime=mime, uncompress=True)
+        self.mime = mime
         self._reset()
 
     def _reset(self):
@@ -34,6 +35,7 @@ class Reporter:
 
 class ReportCSV(Reporter):
     def report(self):
+        print "\"filename\",\"%s\"" % (["type", "mimetype"][self.scanner.mime])
         for t, fs in self.scanner.types.iteritems():
             for f in fs:
                 print "\"%s\",\"%s\"" % (f, t)
