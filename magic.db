@@ -5,7 +5,7 @@
 
 # Cronos databases
 0	string CroFile\0				Cronos Database File
-!:mime	database/cronos
+!:mime	application/x-cronos-db
 
 # CSV, TSV
 0	regex	((["']{0,1})(.*)["']{0,1}[,])+	 	CSV File, Comma Separated
