@@ -1,2 +1,4 @@
 click
 python-magic
+rarfile
+
