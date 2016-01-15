@@ -31,7 +31,7 @@ class Scanner:
 
         if mime in package_handlers.keys() and self.options['packages']:
             a = package_handlers[mime](buffer)
-            self.scan_archive(a)
+            self.scan_archive(path, a)
         else:
             if not mime in self.types: self.types[mime] = []
             self.files[path] = {}
@@ -41,9 +41,9 @@ class Scanner:
                 self.files[path]['size'] = stat.st_size
             self.types[mime].append(path)
 
-    def scan_archive(self, archive):
+    def scan_archive(self, path, archive):
         for (filename, fh) in archive:
-            path = os.path.join(archive, filename)
+            path = os.path.join(path, filename)
             self.total += 1
             self.scan_file(path, fh)
 
