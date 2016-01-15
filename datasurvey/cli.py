@@ -114,9 +114,9 @@ outputmodes = {
 @click.option('--format', type=click.Choice(outputmodes.keys()),
     default="report", help="Choose output format")
 @click.option('--size', is_flag=True, help="Show file sizes")
-@click.option('--target', type=click.File('w'), default='-')
+@click.option('--target', type=click.File('w'), default='-', help="Output to file")
 @click.option('--progress', is_flag=True, help="Show scanning progress")
-@click.option('--packages/--no-packages', default=True, help="Descend into packages")
+@click.option('--packages/--no-packages', default=True, help="Descend into packages? (Default: yes)")
 def main(path, **options):
     scanner = Scanner(**options)
     scanner.scan_path(path)
