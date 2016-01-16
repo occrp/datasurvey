@@ -25,6 +25,29 @@ class ReportCSV(Reporter):
                 line.append(details['size'])
             writer.writerow(line)
 
+class ReportAllFancy(Reporter):
+    def print_table(self, file, header, table):
+        col_width = [max(len(x) for x in col) for col in zip(*table)]
+        file.write("| " + " | ".join("{:{}}".format(x, col_width[i]) for i, x in enumerate(header)) + " |\n")
+        file.write("|-" + "-|-".join("-"*col_width[i] for i in range(len(header))) + "-|\n")
+        for line in table:
+            file.write("| " + " | ".join("{:{}}".format(x, col_width[i]) for i, x in enumerate(line)) + " |\n")
+
+    def report(self):
+        headers = ["Filename", ["Type", "Mimetype"][self.scanner.mime]]
+        if self.options['size']:
+            headers.append('Size')
+
+        data = []
+        for f, details in self.scanner.files.iteritems():
+            line = [f, details['mime']]
+            if self.options['size']:
+                line.append(details['size'])
+            data.append(line)
+
+        self.print_table(self.options['target'], headers, data)
+
+
 class ReportAggregate(Reporter):
     def report(self):
         for t, fs in self.scanner.types.iteritems():
@@ -44,6 +67,7 @@ class ReportBadmatch(Reporter):
 
 outputmodes = {
     "csv":      ReportCSV,
+    "fancy":    ReportAllFancy,
     "report":   ReportAggregate,
     "badmatch": ReportBadmatch,
 }
