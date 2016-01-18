@@ -1,5 +1,14 @@
 # datasurvey
-Crawl a directory of files and generate a summary of what is available.
+
+Crawl a directory of files and generate a summary of what is available. Builds on libmagic, and uses
+Magic database to identify files. Is therefore similar in function to `file(1)`, except:
+
+ * Configurable output reporters:
+   * CSV list of all files
+   * List of files with mime types from a 'bad match' list
+   * Fancy table output
+   * Aggregate reports showing number of each type of file
+ * Recursion into archives such as Zip and RAR.
 
 ## Installation
 
@@ -39,6 +48,11 @@ The clever way to do this is to mount a volume you wish to use:
 $ docker run -t datasurvey -v /path/to/data:/data:ro
 # datasurvey [OPTIONS] /data
 ```
+
+## Known bugs
+
+ * Encountering archives inside archives may cause crashes
+
 
 ## Contact
 
