@@ -6,6 +6,19 @@ from magic import Magic
 from packages import package_handlers
 from reporters import outputmodes
 
+## Priority list for testing string codecs
+string_codecs = ['utf16', 'utf8', 'cp437', 'cp1252', 'cp1251', 'koi8_r', 'koi8_u',
+    'iso8859_1', 'iso8859_5', 'iso8859_6', 'iso8859_7', 'iso8859_8']
+
+def force_decode(string, codecs=string_codecs):
+    for i in codecs:
+        try:
+            return string.decode(i)
+        except:
+            pass
+
+    return string
+
 class Scanner:
     def __init__(self, **options):
         self.options = options
@@ -43,7 +56,12 @@ class Scanner:
 
     def scan_archive(self, path, archive):
         for (filename, fh) in archive:
-            npath = os.path.join(path, filename)
+            filename = force_decode(filename)
+            try:
+                npath = os.path.join(path, filename)
+            except UnicodeDecodeError, e:
+                print "Unicode decoding error: %s/%s" % (e.encoding, ":".join("{:02x}".format(ord(c)) for c in filename))
+                continue
             self.total += 1
             self.scan_file(npath, fh)
 
