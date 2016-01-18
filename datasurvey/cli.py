@@ -39,32 +39,48 @@ class Scanner:
     def scan_file(self, path, buffer=None):
         if buffer:
             mime = self.magic.from_buffer(buffer)
-        else:
+        elif path:
             buffer = open(path, 'rb')
             mime = self.magic.from_file(path)
+        else:
+            print "Can't do anything without a filename or buffer."
+            return
 
         if mime in package_handlers.keys() and self.options['packages']:
-            a = package_handlers[mime](buffer)
-            self.scan_archive(path, a)
+            try:
+                a = package_handlers[mime](buffer)
+                self.scan_archive(path, a)
+            except:
+                self.register_file(path, mime)
         else:
-            if not mime in self.types: self.types[mime] = []
-            self.files[path] = {}
-            self.files[path]['mime'] = mime
-            if self.options['size']:
+            self.register_file(path, mime)
+
+    def register_file(self, path, mime):
+        if not mime in self.types: self.types[mime] = []
+        self.files[path] = {}
+        self.files[path]['mime'] = mime
+        if self.options['size']:
+            try:
                 stat = os.stat(path)
                 self.files[path]['size'] = stat.st_size
-            self.types[mime].append(path)
+            except:
+                self.files[path]['size'] = 0
+        self.types[mime].append(path)
 
     def scan_archive(self, path, archive):
         for (filename, fh) in archive:
-            filename = force_decode(filename)
-            try:
-                npath = os.path.join(path, filename)
-            except UnicodeDecodeError, e:
-                print "Unicode decoding error: %s/%s" % (e.encoding, ":".join("{:02x}".format(ord(c)) for c in filename))
-                continue
             self.total += 1
-            self.scan_file(npath, fh)
+            try:
+                filename = guess_encoding(filename)
+                path = guess_encoding(path)
+                npath = os.path.join(path, filename)
+                self.scan_file(npath, fh)
+            except:
+                self.scan_file(None, fh)
+
+            #except UnicodeDecodeError, e:
+            #    print "Unicode decoding error: %s/%s" % (e.encoding, ":".join("{:02x}".format(ord(c)) for c in filename))
+            #    continue
 
     def scan_path(self, path):
         for root, directory, files in os.walk(path):
