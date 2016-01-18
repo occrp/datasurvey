@@ -2,22 +2,23 @@
 import os
 import sys
 import click
+import chardet
 from magic import Magic
 from packages import package_handlers
 from reporters import outputmodes
 
-## Priority list for testing string codecs
-string_codecs = ['utf16', 'utf8', 'cp437', 'cp1252', 'cp1251', 'koi8_r', 'koi8_u',
-    'iso8859_1', 'iso8859_5', 'iso8859_6', 'iso8859_7', 'iso8859_8']
-
-def force_decode(string, codecs=string_codecs):
-    for i in codecs:
-        try:
-            return string.decode(i)
-        except:
-            pass
-
-    return string
+def guess_encoding(text):
+    if text is None or len(text) == 0:
+        return
+    if isinstance(text, unicode):
+        return text
+    enc = chardet.detect(text)
+    out = enc.get('encoding', 'utf-8')
+    if out is None:
+        # Awkward!
+        return text
+    # print u"%s --[%s]-> %s" % (text, out, text.decode(out))
+    return text.decode(out)
 
 class Scanner:
     def __init__(self, **options):
