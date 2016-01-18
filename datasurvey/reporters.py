@@ -60,7 +60,7 @@ class ReportBadmatch(Reporter):
     def report(self):
         for t in self.badmatches:
             self.outfile.write("\n# %s\n\n" % (t))
-            for fs in self.scanner.types[t]:
+            for fs in self.scanner.types.get(t, []):
                 self.outfile.write(" * %s\n" % (fs))
             self.outfile.write("\n")
 
