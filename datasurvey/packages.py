@@ -15,9 +15,13 @@ class PackageHandler:
                 continue
             if name[-1] == "/":
                 continue
-            with self.archive.open(name) as ar:
-                # TODO: Handle archives
-                outbuf = ar.read(1000)
+            try:
+                with self.archive.open(name) as ar:
+                    # TODO: Handle archives
+                    outbuf = ar.read(1000)
+            except:
+                print "Error reading archive"
+                continue
 
             yield (name, outbuf)
 
