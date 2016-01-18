@@ -43,9 +43,9 @@ class Scanner:
 
     def scan_archive(self, path, archive):
         for (filename, fh) in archive:
-            path = os.path.join(path, filename)
+            npath = os.path.join(path, filename)
             self.total += 1
-            self.scan_file(path, fh)
+            self.scan_file(npath, fh)
 
     def scan_path(self, path):
         for root, directory, files in os.walk(path):
