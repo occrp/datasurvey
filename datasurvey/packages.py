@@ -10,6 +10,11 @@ class PackageHandler:
 
     def __iter__(self):
         for name in self.archive.namelist():
+            info = self.archive.getinfo(name)
+            if hasattr(info, 'isdir') and info.isdir():
+                continue
+            if name[-1] == "/":
+                continue
             with self.archive.open(name) as ar:
                 # TODO: Handle archives
                 outbuf = ar.read(1000)
