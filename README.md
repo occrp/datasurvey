@@ -51,7 +51,13 @@ $ docker run -t datasurvey -v /path/to/data:/data:ro
 
 ## Known bugs
 
+ * Zip and Rar files don't clearly indicate filename encoding; guessing is hard.
  * Encountering archives inside archives may cause crashes
+
+## TODO
+
+ * Needs a lot more testing.
+ * Support tar, tar.gz, tar.bz2, tar.z7, etc.
 
 
 ## Contact
