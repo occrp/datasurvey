@@ -23,11 +23,13 @@ def guess_encoding(text):
 
 
 class Scanner:
+
     def __init__(self, **options):
         self.options = options
         self.mime = options['mime']
         self.progress = options['progress']
-        self.magic = Magic(magic_file='magic.db', mime=self.mime, uncompress=False)
+        self.magic = Magic(magic_file='magic.db', mime=self.mime,
+                           uncompress=False)
         self._reset()
 
     def _reset(self):
@@ -52,7 +54,8 @@ class Scanner:
             try:
                 a = package_handlers[mime](buffer)
                 self.scan_archive(path, a)
-            except:
+            except Exception as ex:
+                print 'ERROR', ex
                 self.register_file(path, mime)
         else:
             self.register_file(path, mime)
@@ -80,10 +83,6 @@ class Scanner:
                 self.scan_file(npath, fh)
             except:
                 self.scan_file(None, fh)
-
-            #except UnicodeDecodeError, e:
-            #    print "Unicode decoding error: %s/%s" % (e.encoding, ":".join("{:02x}".format(ord(c)) for c in filename))
-            #    continue
 
     def scan_path(self, path):
         for root, directory, files in os.walk(path):
