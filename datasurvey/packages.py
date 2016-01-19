@@ -4,6 +4,7 @@ import rarfile
 import zipfile
 import tarfile
 
+
 class PackageHandler:
     def __init__(self, buffer):
         self.buffer = buffer
@@ -25,17 +26,21 @@ class PackageHandler:
 
             yield (name, outbuf)
 
+
 class ZipHandler(PackageHandler):
     MIMETYPES = ["application/zip"]
+
     def __init__(self, buffer):
         PackageHandler.__init__(self, buffer)
         self.archive = zipfile.ZipFile(buffer)
 
+
 class RarHandler(PackageHandler):
     MIMETYPES = ["application/x-rar-compressed"]
+
     def __init__(self, buffer):
         PackageHandler.__init__(self, buffer)
-        self.archive = zipfile.RarFile(buffer)
+        self.archive = rarfile.RarFile(buffer)
 
 
 

@@ -7,6 +7,7 @@ from magic import Magic
 from packages import package_handlers
 from reporters import outputmodes
 
+
 def guess_encoding(text):
     if text is None or len(text) == 0:
         return
@@ -19,6 +20,7 @@ def guess_encoding(text):
         return text
     # print u"%s --[%s]-> %s" % (text, out, text.decode(out))
     return text.decode(out)
+
 
 class Scanner:
     def __init__(self, **options):
@@ -56,7 +58,8 @@ class Scanner:
             self.register_file(path, mime)
 
     def register_file(self, path, mime):
-        if not mime in self.types: self.types[mime] = []
+        if mime not in self.types:
+            self.types[mime] = []
         self.files[path] = {}
         self.files[path]['mime'] = mime
         if self.options['size']:
@@ -100,11 +103,13 @@ class Scanner:
 @click.argument('path', type=click.Path(exists=True))
 @click.option('--mime', is_flag=True, help="Show mime types")
 @click.option('--format', type=click.Choice(outputmodes.keys()),
-    default="report", help="Choose output format")
+              default="report", help="Choose output format")
 @click.option('--size', is_flag=True, help="Show file sizes")
-@click.option('--target', type=click.File('w'), default='-', help="Output to file")
+@click.option('--target', type=click.File('w'), default='-',
+              help="Output to file")
 @click.option('--progress', is_flag=True, help="Show scanning progress")
-@click.option('--packages/--no-packages', default=True, help="Descend into packages? (Default: yes)")
+@click.option('--packages/--no-packages', default=True,
+              help="Descend into packages? (Default: yes)")
 def main(path, **options):
     scanner = Scanner(**options)
     scanner.scan_path(path)

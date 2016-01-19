@@ -26,6 +26,10 @@ setup(
     zip_safe=False,
     test_suite='nose.collector',
     install_requires=[
+        'click',
+        'chardet',
+        'python-magic',
+        'rarfile'
     ],
     tests_require=[
         'nose',

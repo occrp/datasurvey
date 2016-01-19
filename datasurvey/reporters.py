@@ -1,5 +1,6 @@
 import csv
 
+
 class Reporter:
     def __init__(self, options, scanner):
         self.options = options
@@ -24,6 +25,7 @@ class ReportCSV(Reporter):
             if self.options['size']:
                 line.append(details['size'])
             writer.writerow(line)
+
 
 class ReportAllFancy(Reporter):
     def print_table(self, file, header, table):
@@ -52,7 +54,8 @@ class ReportAggregate(Reporter):
     def report(self):
         for t, fs in self.scanner.types.iteritems():
             self.outfile.write("%-35s: %d (%d%%)\n" % (t, len(fs),
-                len(fs)*100/self.scanner.total))
+                               len(fs) * 100 / self.scanner.total))
+
 
 class ReportBadmatch(Reporter):
     badmatches = ["text/plain", "application/octet-stream"]
@@ -66,8 +69,8 @@ class ReportBadmatch(Reporter):
 
 
 outputmodes = {
-    "csv":      ReportCSV,
-    "fancy":    ReportAllFancy,
-    "report":   ReportAggregate,
+    "csv": ReportCSV,
+    "fancy": ReportAllFancy,
+    "report": ReportAggregate,
     "badmatch": ReportBadmatch,
 }
