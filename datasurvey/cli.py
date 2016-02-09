@@ -12,13 +12,15 @@ logging.getLogger('dataset').setLevel(logging.WARNING)
 
 @click.command()
 @click.argument('path', type=click.Path(exists=True))
-@click.option('--target', type=click.File('w'), default='-',
-              help="Output to file")
-@click.option('--progress', is_flag=True, help="Show scanning progress")
-def main(path, target, **options):
-    store = Store()
+@click.option('--csv', type=click.File('w'), default=None,
+              help="Output to CSV file")
+@click.option('--db', type=click.Path(), default=None,
+              help="SQLite database location")
+def main(path, csv, db, **options):
+    store = Store(db)
     scan_path(store, None, path)
-    store.save(target)
+    if csv is not None:
+        store.save(csv)
 
 
 if __name__ == "__main__":
