@@ -25,5 +25,9 @@ def scan_path(store, parent, path):
     if best_scanner is None:
         log.warning("Cannot find a scanner for: %r", path)
     else:
-        best_scanner.scan()
-        best_scanner.cleanup()
+        try:
+            best_scanner.scan()
+        except Exception as ex:
+            log.exception(ex)
+        finally:
+            best_scanner.cleanup()

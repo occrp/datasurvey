@@ -2,3 +2,4 @@ click
 python-magic
 rarfile
 chardet
+dataset
