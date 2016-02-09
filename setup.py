@@ -38,6 +38,10 @@ setup(
     entry_points={
         'console_scripts': [
             'datasurvey = datasurvey.cli:main'
+        ],
+        'datasurvey.scanners': [
+            'file = datasurvey.scanner:FileScanner',
+            'dir = datasurvey.scanner:DirectoryScanner'
         ]
     }
 )
