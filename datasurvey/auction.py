@@ -20,7 +20,10 @@ def scan_path(store, parent, path):
         if bid > best_bid:
             best_bid = bid
             best_scanner = scanner
+        else:
+            scanner.cleanup()
     if best_scanner is None:
         log.warning("Cannot find a scanner for: %r", path)
     else:
-        return best_scanner.scan()
+        best_scanner.scan()
+        best_scanner.cleanup()

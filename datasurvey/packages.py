@@ -1,54 +1,96 @@
+import os
+import logging
+import shutil
 import gzip
 import bz2
 import rarfile
 import zipfile
 import tarfile
+import tempfile
+
+from datasurvey.scanner import FileScanner
+
+log = logging.getLogger(__name__)
 
 
-class PackageHandler:
-    def __init__(self, buffer):
-        self.buffer = buffer
+class PackageScanner(FileScanner):
 
-    def __iter__(self):
-        for name in self.archive.namelist():
-            info = self.archive.getinfo(name)
-            if hasattr(info, 'isdir') and info.isdir():
-                continue
-            if name[-1] == "/":
-                continue
-            try:
-                with self.archive.open(name) as ar:
-                    # TODO: Handle archives
-                    outbuf = ar.read(1000)
-            except:
-                print "Error reading archive"
-                continue
+    def __init__(self, store, parent, name):
+        super(PackageScanner, self).__init__(store, parent, name)
+        self.extract_dir = tempfile.mkdtemp()
 
-            yield (name, outbuf)
+    @property
+    def real_path(self):
+        return self.extract_dir
 
+    @property
+    def package_path(self):
+        if not self.root:
+            return os.path.join(self.parent.real_path, self.name)
+        return self.name
 
-class ZipHandler(PackageHandler):
-    MIMETYPES = ["application/zip"]
+    def scan(self):
+        self.emit_file(self.package_path)
+        try:
+            self.unpack_to_directory()
+            for name in os.listdir(self.extract_dir):
+                self.descend(name)
+        finally:
+            self.cleanup()
 
-    def __init__(self, buffer):
-        PackageHandler.__init__(self, buffer)
-        self.archive = zipfile.ZipFile(buffer)
+    def unpack_to_directory(self):
+        raise NotImplemented()
 
-
-class RarHandler(PackageHandler):
-    MIMETYPES = ["application/x-rar-compressed"]
-
-    def __init__(self, buffer):
-        PackageHandler.__init__(self, buffer)
-        self.archive = rarfile.RarFile(buffer)
+    def cleanup(self):
+        try:
+            shutil.rmtree(self.extract_dir)
+        except:
+            pass
 
 
+class ZipFileScanner(PackageScanner):
 
-package_handlers = {}
+    IGNORE_EXT = ['docx', 'xlsx', 'pptx', 'ods', 'odt']
 
-def register_handler(handler):
-    for mt in handler.MIMETYPES:
-        package_handlers[mt] = handler
+    def unpack_to_directory(self):
+        log.info("Reading ZIP file: %s", self.path_name)
+        with zipfile.ZipFile(self.package_path, 'r') as fh:
+            fh.extractall(path=self.extract_dir)
 
-register_handler(ZipHandler)
-register_handler(RarHandler)
+    def bid(self):
+        if os.path.isdir(self.package_path):
+            return
+        _, ext = os.path.splitext(self.package_path.lower())
+        ext = ext.strip('.')
+        if ext in self.IGNORE_EXT:
+            return
+        if zipfile.is_zipfile(self.package_path):
+            return 3
+
+
+class TarFileScanner(PackageScanner):
+
+    def unpack_to_directory(self):
+        log.info("Reading tarball: %s", self.path_name)
+        with tarfile.TarFile(self.package_path, 'r') as fh:
+            fh.extractall(path=self.extract_dir)
+
+    def bid(self):
+        if os.path.isdir(self.package_path):
+            return
+        if tarfile.is_tarfile(self.package_path):
+            return 3
+
+
+class RarFileScanner(PackageScanner):
+
+    def unpack_to_directory(self):
+        log.info("Reading RAR file: %s", self.path_name)
+        with rarfile.RarFile(self.package_path, 'r') as fh:
+            fh.extractall(path=self.extract_dir)
+
+    def bid(self):
+        if os.path.isdir(self.package_path):
+            return
+        if rarfile.is_rarfile(self.package_path):
+            return 3

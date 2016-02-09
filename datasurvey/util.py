@@ -11,7 +11,7 @@ def guess_encoding(text):
     out = enc.get('encoding', 'utf-8')
     if out is None:
         # Awkward!
-        return text
+        return text.decode('ascii', 'replace')
     return text.decode(out)
 
 

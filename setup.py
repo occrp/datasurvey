@@ -29,7 +29,8 @@ setup(
         'click',
         'chardet',
         'python-magic',
-        'rarfile'
+        'rarfile',
+        'dataset'
     ],
     tests_require=[
         'nose',
@@ -41,7 +42,10 @@ setup(
         ],
         'datasurvey.scanners': [
             'file = datasurvey.scanner:FileScanner',
-            'dir = datasurvey.scanner:DirectoryScanner'
+            'dir = datasurvey.scanner:DirectoryScanner',
+            'zip = datasurvey.packages:ZipFileScanner',
+            'tar = datasurvey.packages:TarFileScanner',
+            'rar = datasurvey.packages:RarFileScanner',
         ]
     }
 )

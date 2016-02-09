@@ -3,7 +3,7 @@ import logging
 import mimetypes
 
 from datasurvey.auction import scan_path
-from datasurvey.util import checksum, sizeof_fmt
+from datasurvey.util import checksum, sizeof_fmt, guess_encoding
 
 log = logging.getLogger(__name__)
 
@@ -13,13 +13,19 @@ class Scanner(object):
     def __init__(self, store, parent, name):
         self.store = store
         self.parent = parent
-        self.name = name
+        self.name = guess_encoding(name)
 
     def scan(self):
         pass
 
     def bid(self):
-        return 0
+        return
+
+    def descend(self, name):
+        scan_path(self.store, self, name)
+
+    def cleanup(self):
+        pass
 
     @property
     def root(self):
@@ -47,9 +53,12 @@ class FileScanner(Scanner):
             return 1
 
     def scan(self):
-        size = os.path.getsize(self.real_path)
-        _, ext = os.path.splitext(self.real_path)
-        mime, enc = mimetypes.guess_type(self.real_path, strict=False)
+        self.emit_file(self.real_path)
+
+    def emit_file(self, file_path):
+        size = os.path.getsize(file_path)
+        _, ext = os.path.splitext(file_path)
+        mime, enc = mimetypes.guess_type(file_path, strict=False)
         mime = mime or enc
         self.store.emit({
             'path_name': self.path_name,
@@ -60,17 +69,21 @@ class FileScanner(Scanner):
             'extension': ext.strip('.').lower(),
             'mime_type': mime,
             'size_human': sizeof_fmt(size),
-            'sha1': checksum(self.real_path)
+            'sha1': checksum(file_path)
         })
 
 
 class DirectoryScanner(Scanner):
+
+    IGNORE = ['.git', '.hg', '__MACOSX']
 
     def bid(self):
         if os.path.isdir(self.real_path):
             return 2
 
     def scan(self):
+        if self.name in self.IGNORE:
+            return
         log.info("Reading directory: %s", self.path_name)
         for name in os.listdir(self.real_path):
-            scan_path(self.store, self, name)
+            self.descend(name)
