@@ -24,9 +24,11 @@ class CronosScanner(DirectoryScanner):
             return 100
 
     def scan(self):
+        log.info('Cronos extract: %s', self.path_name)
         target_dir = os.environ.get('CRONOS_OUTDIR')
         if target_dir is None:
-            pass
+            log.warning('No CRONOS_OUTDIR is set.')
+            return
         sub_dir = slugify(unidecode(self.path_name), '_')
         target_dir = os.path.join(target_dir, sub_dir)
         try:

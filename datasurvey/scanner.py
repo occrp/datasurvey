@@ -27,6 +27,12 @@ class Scanner(object):
     def cleanup(self):
         pass
 
+    def get_child_path_name(self, name):
+        return os.path.join(self.path_name, name)
+
+    def get_child_real_path(self, name):
+        return os.path.join(self.real_path, name)
+
     @property
     def root(self):
         return self.parent is None
@@ -35,13 +41,13 @@ class Scanner(object):
     def path_name(self):
         if self.root:
             return ''
-        return os.path.join(self.parent.path_name, self.name)
+        return self.parent.get_child_path_name(self.name)
 
     @property
     def real_path(self):
-        if not self.root:
-            return os.path.join(self.parent.real_path, self.name)
-        return self.name
+        if self.root:
+            return self.name
+        return self.parent.get_child_real_path(self.name)
 
 
 class FileScanner(Scanner):
