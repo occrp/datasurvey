@@ -1,0 +1,9 @@
+survey:
+  build: .
+  volumes:
+    - "/tmp/datasurvey/:/tmp/"
+    - "/srv/data/:/srv/data/"
+  command: /bin/bash
+  hostname: survey
+  environment:
+    CRONOS_OUTDIR: /srv/data/source/cronos

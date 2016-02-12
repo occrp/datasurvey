@@ -56,6 +56,7 @@ class FileScanner(Scanner):
         self.emit_file(self.real_path)
 
     def emit_file(self, file_path):
+        return  # HACK HACK HACK
         size = os.path.getsize(file_path)
         _, ext = os.path.splitext(file_path)
         mime, enc = mimetypes.guess_type(file_path, strict=False)

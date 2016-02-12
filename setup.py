@@ -46,6 +46,7 @@ setup(
             'zip = datasurvey.packages:ZipFileScanner',
             'tar = datasurvey.packages:TarFileScanner',
             'rar = datasurvey.packages:RarFileScanner',
+            'cro = datasurvey.cro:CronosScanner',
         ]
     }
 )
