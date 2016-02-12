@@ -1,8 +1,6 @@
 import os
 import logging
 import shutil
-import gzip
-import bz2
 import rarfile
 import zipfile
 import tarfile
